@@ -10,6 +10,8 @@ tend = datenum([2013 04 11 10 45 31]);
 TLEfile = 'sat_27372_test.txt';
 dtsec = 0.1; %time step in seconds
 % this must contain calibration from camera pointing at time of image taking
+% does not have to be at this TIME as long as camera has not been moved
+% SINCE calibration!
 calfile = 'hst1cal.mat'; 
 
 %% get tle (can also just cut and paste)
