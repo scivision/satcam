@@ -29,8 +29,8 @@ function [sataer, satLLA, satpix,tUTC] = satazel(camlla,camname,tle,tstart,tend,
 %
 if nargin<7, calfile = []; end
 %% (0) load Charles Rino's SatOrbit
-addpath('../SGP4') % http://www.mathworks.com/matlabcentral/fileexchange/28888-satellite-orbit-computation
-addpath('../GPS_CoordinateXforms') %http://www.mathworks.com/matlabcentral/fileexchange/28813-gps-coordinate-transformations
+addpath('SGP4') % http://www.mathworks.com/matlabcentral/fileexchange/28888-satellite-orbit-computation
+addpath('GPS_CoordinateXforms') %http://www.mathworks.com/matlabcentral/fileexchange/28813-gps-coordinate-transformations
 
 if verLessThan('matlab','8.0'), 
     error('This program requires Matlab R2012b or newer to run the geometric transforms')
@@ -135,7 +135,7 @@ if ~isempty(calfile)
     % We may find the satellite arrives at a pixel later than expected -- that's due
     % to camera time error (or position and pointing error).
 
-    catch excp %#ok<NASGU>
+    catch excp 
         display('oops, trouble with finding sat')
         %satpix = [];  %in case this code part crashes
         rethrow(excp)
