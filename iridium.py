@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 #from scipy.io import netcdf No, can't handle netcdf4 only 3
 import sys
-sys.path.append('../astrometry')
-sys.path.append('../python-mapping')
-from coordconv3d import ecef2geodetic,eci2ecef,ecef2eci
-from datetime2hourangle import datetime2sidereal
+from pymap3d.coordconv3d import ecef2geodetic,eci2ecef,ecef2eci
+from astrometry_azel.datetime2hourangle import datetime2sidereal
 from netCDF4 import Dataset
 import matplotlib.pyplot as plt
-from pdb import set_trace
 from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
 
