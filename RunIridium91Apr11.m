@@ -12,7 +12,7 @@ dtsec = 0.1; %time step in seconds
 % this must contain calibration from camera pointing at time of image taking
 % does not have to be at this TIME as long as camera has not been moved
 % SINCE calibration!
-calfile = 'hst1cal.mat'; 
+calfile = '../histfeas/precompute/hst1cal.h5'; 
 
 %% get tle (can also just cut and paste)
  TLEpath = '../satcam-data';
