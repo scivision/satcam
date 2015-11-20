@@ -4,7 +4,17 @@ satcam
 
 Using known satellite positions to verify camera timing.
 
+===================    ==============
+program                description
+===================    ==============
+RunIridium91Apr11       plot where satellites exist vs. time on x,y pixel map
+RunSatCrossTime         plot when satellite crossed expected pixel (for fine absolute timing verification)
+===================    ==============
+
+
+
 Algorithm:
+----------
   1. Using TLE and SGP4 propagator, get az/el for satellite from an observer vs. time
   2. Load video frames from the selected times. 
   3. Pick a pixel to plot w.r.t. time. Variable "satpix" is an Nx2 matrix of x,y pixel coordinates, and N is the number of time steps.
