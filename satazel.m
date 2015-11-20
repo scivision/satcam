@@ -1,4 +1,4 @@
-function [sataer, satLLA, satpix,tUTC] = satazel(camlla,camname,tle,tstart,tend,dtSec,calfile,makeplots)
+function [sataer, satlla, satpix,t] = satazel(camlla,camname,tle,tstart,tend,dtSec,calfile,makeplots)
 % Michael Hirsch  July 2013
 % upgraded and extended by Amber Baurley Aug 2014
 % GPLv3+ license
@@ -23,92 +23,17 @@ function [sataer, satLLA, satpix,tUTC] = satazel(camlla,camname,tle,tstart,tend,
 % then converted to Lat Lon Alt vs. time of satellite
 % 2) convert Lat Lon Alt to Azimuth/elevation for each site
 % 3) find camera pixel coordinates that satellite should appear at vs. time
-% (TODO)
 % 4) plot
 %
 %
 if nargin<7, calfile = []; end
-%% (0) load Charles Rino's SatOrbit
-addpath('SGP4') % http://www.mathworks.com/matlabcentral/fileexchange/28888-satellite-orbit-computation
-addpath('GPS_CoordinateXforms') %http://www.mathworks.com/matlabcentral/fileexchange/28813-gps-coordinate-transformations
-
-if verLessThan('matlab','8.0'), 
-    error('This program requires Matlab R2012b or newer to run the geometric transforms')
-end
-
-min_per_day=60*24;
-sec_per_day=60*min_per_day;
-
-%% (1) run SGP4 for satellite
-try
-satrec = twoline2rvMOD(tle{1},tle{2});
-catch excp, display('It looks like you need to install Charles Rino''s SatOrbit:')
-    display('http://www.mathworks.com/matlabcentral/fileexchange/28888-satellite-orbit-computation')
-    display('and Charles Rino''s GPS Coordinate Transforms:')
-    display('www.mathworks.com/matlabcentral/fileexchange/28813-gps-coordinate-transformations')
-    fclose('all');
-    rethrow(excp)
-end
-fprintf('\n')
-fprintf('Satellite ID %5i \n',satrec.satnum)
-fprintf('Observer 1: %s Lat=%6.4f Lon %6.4f Alt=%3.2f m\n',...
-            camname,camlla(1),camlla(2),camlla(3))
-
-                
-if (satrec.epochyr < 57)
-    Eyear= satrec.epochyr + 2000;
-else
-    Eyear= satrec.epochyr + 1900;
-end
-
-%converts the day of the year, days, to the equivalent month, day, hour, minute and second.
-[Emon,Eday,Ehr,Emin,Esec] = days2mdh(Eyear,satrec.epochdays);
-
-EpochDateNum = datenum([Eyear,Emon,Eday,Ehr,Emin,Esec]); 
-tsinceDateNum = (tstart-EpochDateNum):dtSec/sec_per_day:(tend-EpochDateNum);
-npts= length(tsinceDateNum);
-
-tsince = tsinceDateNum*min_per_day; %[minutes]
-display(['Epoch time is: ',datestr(EpochDateNum)])
-xsat_ecf=zeros(3,npts);
-vsat_ecf=zeros(3,npts);
-for n=1:npts
-   [satrec, xsat_ecf(:,n), vsat_ecf(:,n)]=spg4_ecf(satrec,tsince(n));
-end
-
-%Scale state vectors to mks units
-xsat_ecf=xsat_ecf*1000;  %m
-vsat_ecf=vsat_ecf*1000;  %#ok<NASGU> %mps
-
-sat_llh=ecf2llhT(xsat_ecf);            %ECF to geodetic (llh)  
-%sat_tcs=llh2tcsT(sat_llh,origin_llh);  %llh to tcs at origin_llh
-%sat_elev=atan2(sat_tcs(3,:),sqrt(sat_tcs(1,:).^2+sat_tcs(2,:).^2));
-%Identify visible segments: 
-%notVIS=find(sat_tcs(3,:)<0);
-%VIS=setdiff([1:npts],notVIS);
-%sat_llh(:,notVIS)=NaN;
-%sat_tcs(:,notVIS)=NaN;
-
-
-%% (2) convert to azimuth/elevation from a site
-tUTC(:,1) = EpochDateNum+tsinceDateNum;
-
-satLLA(:,1) = rad2deg(sat_llh(2,:));
-satLLA(:,2) = rad2deg(sat_llh(1,:));
-satLLA(:,3) = sat_llh(3,:);
-
-[sataer(:,1), sataer(:,2), sataer(:,3)] = ecef2aer(xsat_ecf(1,:),xsat_ecf(2,:),xsat_ecf(3,:),...
-                                                    camlla(1),camlla(2),camlla(3),...
-                                                    referenceEllipsoid('wgs84'),'degrees');
-%sanity check
-if all(sataer(:,2)<0)
-    error('The satellite is always below the horizon, something seems amiss with your time, parameters, or calibration')
-end
+%% (0) (1) (2)
+[t,sataer,satlla] = tle2azel(tle,camlla,tstart,tend,camname,dtSec);
 %% 3) find when satellite crosses a pixel
 % goal of this is to verify absolute timing of camera
 if ~isempty(calfile)
     try
-    %load astrometry.net .mat file we made from fits2azel.py
+    %load astrometry.net plate scale file we made from github.com/scienceopen/astrometry_azel/fits2azel.py
     
     [azcal,elcal,xcal,ycal] = getcamcal(calfile);
     
@@ -116,8 +41,8 @@ if ~isempty(calfile)
     % on the image sensor (wouldn't make sense any other way)
     [nearrow,nearcol,goodInd] = findClosestAzel(azcal,elcal,sataer(:,1),sataer(:,2),true);
     sataer = sataer(goodInd,:);
-    satLLA = satLLA(goodInd,:);
-    tUTC = tUTC(goodInd,:);
+    satlla = satlla(goodInd,:);
+    t = t(goodInd,:);
     
     npts = length(nearrow);
     satpix = zeros(npts,2);
@@ -144,21 +69,21 @@ else
     display('no calfile specified')
 end %if
 %% 4) plots
-if any(ismember(makeplots,'lla')) && ~isempty(satLLA)
+if any(ismember(makeplots,'lla')) && ~isempty(satlla)
     hFd = figure(1); clf(1)
     subplot(2,1,1)
-    plot(tUTC,satLLA(:,3)/1e3,'.')
+    plot(t,satlla(:,3)/1e3,'.')
     ylabel('Satellite Alitude [km]')
     xlabel('Time [UTC]')
     datetick('x')
-    title(['Satellite Data, ',datestr(tUTC(1),'yyyy-mm-dd'),'.  Epoch: ',datestr(EpochDateNum) ])
+    title(['Satellite Data, ',datestr(t(1),'yyyy-mm-dd'),'.  Epoch: ',datestr(EpochDateNum) ])
    % showTLE(gca,tle) %show the TLE used
 
     subplot(2,1,2)
-    plot(satLLA(:,1),satLLA(:,2),'.')
+    plot(satlla(:,1),satlla(:,2),'.')
     ylabel('Latitude [deg]')
     xlabel('Longitude [deg]')
-    title(['Satellite Data, ',datestr(tUTC(1)),' to ',datestr(tUTC(end)),'.  Epoch: ',datestr(EpochDateNum)])
+    title(['Satellite Data, ',datestr(t(1)),' to ',datestr(t(end)),'.  Epoch: ',datestr(EpochDateNum)])
    % showTLE(gca,tle) %show the TLE used
 
     fcp = get(hFd,'pos');
@@ -178,13 +103,13 @@ if any(ismember(makeplots,'azel')) && ~isempty(sataer)
 
     ylabel(hAxc1,'elevation [deg]')
     xlabel(hAxc1,'azimuth [deg]')
-    title(hAxc1,{['Satellite seen from camera, dt=',num2str(dtSec),'sec., ',datestr(tUTC(1)),' to ',datestr(tUTC(end))],...
+    title(hAxc1,{['Satellite seen from camera, dt=',num2str(dtSec),'sec., ',datestr(t(1)),' to ',datestr(t(end))],...
                    ['.  Epoch: ',datestr(EpochDateNum)]})
     %make azimuth axis be more proportional to image plane
     %set(hAxc1,'xlim',[180 225])
     legend('show')
 
-    tlblpts(sataer(:,1),sataer(:,2),tUTC,npts)
+    tlblpts(sataer(:,1),sataer(:,2),t,npts)
 
     showTLE(hAxc1,tle) %show the TLE used
 end
@@ -202,7 +127,7 @@ if any(ismember(makeplots,'pix')) && ~isempty(satpix)
     xlabel('x-pixel')
     ylabel('y-pixel')
 
-    tlblpts(satpix(:,1),satpix(:,2),tUTC,npts)
+    tlblpts(satpix(:,1),satpix(:,2),t,npts)
    % legend('show','location','best')
     set(axpix,'xlim',[1,nx],'ylim',[1,ny])
 end
@@ -222,7 +147,7 @@ function [azcal,elcal,xcal,ycal] = getcamcal(calfile)
 [~,~,ext] = fileparts(calfile);
 
 switch lower(ext)
-    case '.mat'
+    case '.mat' %use HDF5 instead normally
        s = load(calfile,'az','el','x','y');
        azcal = s.az; 
        elcal = s.el; 
@@ -240,13 +165,13 @@ end
 
 end
 
-function tlblpts(x,y,tUTC,npts)
+function tlblpts(x,y,t,npts)
     %label a few points
     if npts>40, decimtxt = 6; %arbitrary, uncluttered plot
     elseif npts>20, decimtxt = 3;
     else decimtxt = 1;
     end
     for i = 1:decimtxt:npts
-       text(x(i),y(i),datestr(tUTC(i),'HH:MM:SS.fff'),'units','data') 
+       text(x(i),y(i),datestr(t(i),'HH:MM:SS.fff'),'units','data') 
     end
 end
