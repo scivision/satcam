@@ -1,30 +1,26 @@
+function RunSatCrossTime(event)
+%%
 % compares points from satazel for points satellite crosses in DMCdata
-
-
-%addpath('/home/aurora1/Documents/MATLAB/satcam-master')
-%addpath('/home/aurora1/Documents/MATLAB/DMCfiles')
+% examples:
+%event = '11Apr2013_irid91'; 
+%event='31Mar2014_irid30';
 
 makeplots = {'pix'}; %'lla','azel'
-addpath('../hist-utils')
-
-%eventsim = '11Apr2013_irid91'; 
-eventsim='31Mar2014_irid30';
+addpath('../histutils')
 
 %% Parameters 
-switch eventsim
+switch event
     case '11Apr2013_irid91'
-        dpath = '~/HSTdata/DataField/2013-04-11/';
-        bigfn = '2013-04-11T07-00-CamSer1387_frames_403709-1-405509.DMCdata';
+        dpath = '~/data/2013-04-11/2013-04-11T07-00-CamSer1387_frames_403709-1-405509.DMCdata';
         fps = 30; % camera 1387 for 11 Apr 2013
         camStart = [2013 04 11 7 0 11];
         satAppear = [2013 04 11 10 45 12];
         % iridium 91, 11 March 2013
         % tle in satcam-data/sat_27372_test.txt
         usecam = 1;
-        calfile = 'hst1cal.mat'; 
+        calfile = '../histfeas/precompute/hst1cal.h5cd '; 
     case '31Mar2014_irid30'
-        dpath = '~/Z/media/aurora1/HST2014image/2014-03-31/';
-        bigfn = '2014-03-31T06-12-CamSer7196.DMCdata';
+        dpath = '/media/aurora1/HST2014image/2014-03-31/2014-03-31T06-12-CamSer7196.DMCdata';
         fps = 53; %from .xml file for 31 mar 2014 ultra
         camStart = [2014 3 31 6 12 23]; %from .nmea file
         satAppear = [2014 3 31 12 29 4]; %from STK Access calcuation
@@ -35,7 +31,6 @@ switch eventsim
     otherwise, error('i don''t have this case defined')
 end
     
-bigfn = [dpath,bigfn];
 calfn = [dpath,calfile];
 
 tRange = [-5 20]; %let's look from 5 seconds before satAppear to 20 seconds after satAppear
@@ -60,8 +55,19 @@ dtsec = 0.5; %time step in seconds
 if isempty(satpix)
     error('I can''t proceed since the satellite is not detected in the FOV. Is the az/el calibration correct for this date?')
 end
-%% DMCdata 
-[x, y, data] = timeDMCreader(bigfn,satAppear,camStart,fps);
+%%
+intensevals = getvideo(dpath);
+%% plot
+plot(squeeze(intensevals))
+title(['Max Intensity ' num2str(satellitemax) ' at frame ' num2str(maxframe)])
+ylabel('Pixel Intensities')
+xlabel('Frame number')
+
+end %function
+
+function getvideo(fn)
+   %% DMCdata 
+[x, y, data] = timeDMCreader(fn,satAppear,camStart,fps);
 
 pixel = satpix(1,:) % check first
 
@@ -86,12 +92,5 @@ timedif = tRange(1) +  maxtime
 %     end
 % end
 % anyconnect = sum(sum(checkmat))
-% % [x,y] = find(checkmat==1)
-
-%% plot
-plot(squeeze(intensevals))
-title(['Max Intensity ' num2str(satellitemax) ' at frame ' num2str(maxframe)])
-ylabel('Pixel Intensities')
-xlabel('Frame number')
-
-
+% % [x,y] = find(checkmat==1) 
+end
