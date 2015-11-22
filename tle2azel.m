@@ -22,7 +22,7 @@ catch excp, display('It looks like you need to install Charles Rino''s SatOrbit:
 end
 fprintf('\n')
 fprintf('Satellite ID %5i \n',satrec.satnum)
-fprintf('Observer 1: %s Lat=%6.4f Lon %6.4f Alt=%3.2f m\n',...
+fprintf('Observer 1: %s Lat=%6.4f Lon %6.4f Alt=%3.1f m\n',...
             camname,camlla(1),camlla(2),camlla(3))
 
                 
@@ -43,6 +43,7 @@ tsince = tsinceDateNum*min_per_day; %[minutes]
 display(['Epoch time is: ',datestr(EpochDateNum)])
 xsat_ecf=zeros(3,npts);
 vsat_ecf=zeros(3,npts);
+%% propagate
 for n=1:npts
    [satrec, xsat_ecf(:,n), vsat_ecf(:,n)]=spg4_ecf(satrec,tsince(n));
 end
