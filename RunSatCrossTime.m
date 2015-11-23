@@ -12,7 +12,11 @@ addpath('../histutils/Matlab')
 rowcol=[512,512];
 
 switch event
-    case '11Apr2013_irid91'
+    case '14Apr2013T0824'
+        dpath = '~/data/2013-04-14/2013-04-14T07-00-CamSer7196_frames';
+        fps = 50;
+        camstart = 
+    case '11Apr2013T1045'
         dpath = '~/data/2013-04-11/2013-04-11T07-00-CamSer1387_frames_403709-1-405509.DMCdata';
         fps = 30; % camera 1387 for 11 Apr 2013
         camstart = [2013 04 11 7 0 11];
