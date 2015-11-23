@@ -21,7 +21,8 @@ switch event
         % tle in satcam-data/sat_27372_test.txt
         usecam = 1;
         calfn = '../histfeas/precompute/hst1cal.h5'; 
-        TLEfn = '../satcam-data/sat_27372_test.txt';
+        TLEfn = '../satcam-data/stkAllComm_2013-04-10.tle';
+        satnum=27372;
         trange = [-5 18]; %let's look from 5 seconds before satAppear to 20 seconds after satAppear.
     case '31Mar2014_irid30'
         dpath = '/media/aurora1/HST2014image/2014-03-31/2014-03-31T06-12-CamSer7196.DMCdata';
@@ -46,10 +47,7 @@ switch usecam
 end %switch usecam  
 %% load satellite TLE
 % get tle (can also just cut and paste)
- fidTLE = fopen(TLEfn);
- tle{1} = fgetl(fidTLE);
- tle{2} = fgetl(fidTLE);
-
+tle = gettle(TLEfn,satnum);
  dtsec = 0.5; %time step in seconds
 %% adjust start playback time to satellite
 try
