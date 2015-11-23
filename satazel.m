@@ -8,8 +8,8 @@ function [sataer, satlla, satpix,t] = satazel(camlla,camname,tle,tstart,tend,dtS
 % camlla: WGS84 camera location [ lat (deg), lon (deg), altitude (meters) ]
 % camname: string with name of camera (arbitrary)
 % tle: 2 element cell, containing text of TLE
-% tstart: datenum of utc time to start plotting data
-% tend: datenum of utc time to stop plotting data
+% tstart: datevec of utc time to start plotting data
+% tend: datevec of utc time to stop plotting data
 % dtsec: time step of simulation (too small, takes forever, too big, skips pixels)
 %
 % OUTPUTS:  (N is number of time steps)
@@ -26,6 +26,19 @@ function [sataer, satlla, satpix,t] = satazel(camlla,camname,tle,tstart,tend,dtS
 % 4) plot
 %
 %
+%% input processing
+if length(tstart)==6 && length(tend) == 6 %assume datevec input
+    try
+        tstart = datetime(tstart);
+        tend   = datetime(tend);
+    catch
+        tstart = datenum(tstart);
+        tend   = datenum(tend);
+    end
+elseif length(tstart)==1 && length(tend)==1 %assume already datetime or datenum
+else error('unknown input type for time')
+end
+
 if nargin<7, calfile = []; end
 %% (0) (1) (2)
 [t,sataer,satlla] = tle2azel(tle,camlla,tstart,tend,camname,dtSec);
@@ -46,14 +59,12 @@ if ~isempty(calfile)
     
     npts = length(nearrow);
     satpix = zeros(npts,2);
-    for ipx = 1:length(nearrow)
-        satpix(ipx,1) = xcal(nearrow(ipx),nearcol(ipx));
-        satpix(ipx,2) = ycal(nearrow(ipx),nearcol(ipx));
+    for i = 1:npts
+        satpix(i,1) = xcal(nearrow(i),nearcol(i));
+        satpix(i,2) = ycal(nearrow(i),nearcol(i));
     end
 
-    nx = max(max(xcal));
-    ny = max(max(ycal));
-    % I believe that satpix should give you the expected image pixel
+    % Satpix should give you the expected image pixel
     % coordinates that the satellite will fall into, assuming timing, pointing, and
     % positions with sufficiently low error (ideal system).
 
@@ -62,7 +73,6 @@ if ~isempty(calfile)
 
     catch excp 
         display('oops, trouble with finding sat')
-        %satpix = [];  %in case this code part crashes
         rethrow(excp)
     end
 else 
@@ -129,7 +139,7 @@ if any(ismember(makeplots,'pix')) && ~isempty(satpix)
 
     tlblpts(satpix(:,1),satpix(:,2),t,npts)
    % legend('show','location','best')
-    set(axpix,'xlim',[1,nx],'ylim',[1,ny])
+ %   set(axpix,'xlim',[1,nx],'ylim',[1,ny])
 end
 %% no outputs?
 if ~nargout, clear, end

@@ -3,13 +3,7 @@ function [t,sataer,satlla] =tle2azel(tle,camlla,tstart,tend,camname,dtSec)
 addpath('SGP4') % http://www.mathworks.com/matlabcentral/fileexchange/28888-satellite-orbit-computation
 addpath('GPS_CoordinateXforms') %http://www.mathworks.com/matlabcentral/fileexchange/28813-gps-coordinate-transformations
 
-if verLessThan('matlab','8.0'), 
-    error('This program requires Matlab R2012b or newer to run the geometric transforms')
-end
-
 min_per_day=60*24;
-sec_per_day=60*min_per_day;
-
 %% (1) run SGP4 for satellite
 try
 satrec = twoline2rvMOD(tle{1},tle{2});
@@ -35,33 +29,38 @@ end
 %converts the day of the year, days, to the equivalent month, day, hour, minute and second.
 [Emon,Eday,Ehr,Emin,Esec] = days2mdh(Eyear,satrec.epochdays);
 
-EpochDateNum = datenum([Eyear,Emon,Eday,Ehr,Emin,Esec]); 
-tsinceDateNum = (tstart-EpochDateNum):dtSec/sec_per_day:(tend-EpochDateNum);
-npts= length(tsinceDateNum);
-
-tsince = tsinceDateNum*min_per_day; %[minutes]
-display(['Epoch time is: ',datestr(EpochDateNum)])
+try
+    Epoch = datetime([Eyear,Emon,Eday,Ehr,Emin,Esec]); 
+    tsince = (tstart-Epoch):seconds(dtSec):(tend-Epoch);
+    tsinceMinutes = minutes(tsince);    
+catch
+    Epoch = datenum([Eyear,Emon,Eday,Ehr,Emin,Esec]); 
+    tsince = (tstart-Epoch):dtSec/86400:(tend-Epoch);
+    tsinceMinutes = tsince*min_per_day; %[minutes]
+end
+npts= length(tsince);
+display(['Epoch time is: ',datestr(Epoch)])
 xsat_ecf=zeros(3,npts);
-vsat_ecf=zeros(3,npts);
+%vsat_ecf=zeros(3,npts);
 %% propagate
 for n=1:npts
-   [satrec, xsat_ecf(:,n), vsat_ecf(:,n)]=spg4_ecf(satrec,tsince(n));
+   [satrec, xsat_ecf(:,n)]=spg4_ecf(satrec,tsinceMinutes(n));
 end
 
 %Scale state vectors to mks units
 xsat_ecf=xsat_ecf*1000;  %m
-vsat_ecf=vsat_ecf*1000;  %#ok<NASGU> %mps
+%vsat_ecf=vsat_ecf*1000;  %mps
 
 sat_llh=ecf2llhT(xsat_ecf);            %ECF to geodetic (llh)  
 %sat_tcs=llh2tcsT(sat_llh,origin_llh);  %llh to tcs at origin_llh
 %sat_elev=atan2(sat_tcs(3,:),sqrt(sat_tcs(1,:).^2+sat_tcs(2,:).^2));
-%Identify visible segments: 
+%% Identify visible segments: 
 %notVIS=find(sat_tcs(3,:)<0);
 %VIS=setdiff([1:npts],notVIS);
 %sat_llh(:,notVIS)=NaN;
 %sat_tcs(:,notVIS)=NaN;
 %% (2) convert to azimuth/elevation from a site
-t(:,1) = EpochDateNum+tsinceDateNum;
+t(:,1) = Epoch+tsince;
 
 satlla(:,1) = rad2deg(sat_llh(2,:));
 satlla(:,2) = rad2deg(sat_llh(1,:));
