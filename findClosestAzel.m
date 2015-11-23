@@ -15,16 +15,16 @@ function [NearestRow, NearestCol,goodBool] = findClosestAzel(AzImg,ElImg,AzVec,E
 % Outputs:
 % nearestRow: Px1 vector of rows of closest pixel to az/el for each element in AzVec,Elvec
 % NearestCol: Px1 vector of columns of closest pixel to az/el for each element in AzVec,ElVec
-if nargin<5, doDiscardEdgePix = false; end
+if nargin<5, 
+    doDiscardEdgePix = false; 
+end
 
 keeplastpixel = false;
 
 [nyPixel,nxPixel] = size(AzImg); 
 %% error check
-if size(AzVec) ~= size(ElVec), error('AzVec and ElVec must be equal-sized vectors'), end
-if all(size(AzImg) ~= size(ElImg)) || length(size(AzImg)) ~=2, 
- error('AzImg and ElImg must be equal-sized 2D matrix'), 
-end 
+assert(all(size(AzVec) == size(ElVec)), 'AzVec and ElVec must be equal-sized vectors')
+assert(all(size(AzImg) == size(ElImg)) && ismatrix(AzImg),'AzImg and ElImg must be equal-sized 2D matrix')
 %% setup
 NptsVec = numel(AzVec);
 %mask = zeros(size(AzImg));
@@ -60,10 +60,10 @@ if doDiscardEdgePix
         warning('All values were discarded, your target is completely outside FOV for all times considered')
     end
     
-    discardInd = find(discardBool);
+    %discardInd = find(discardBool);
     NearestRow(discardBool) = [];
     NearestCol(discardBool) = [];
-    display(['Discarded ',int2str(length(discardInd)),' instances'])
+    display(['Discarded ',int2str(sum(discardBool)),' instances'])
     goodBool = ~discardBool;
     
 
