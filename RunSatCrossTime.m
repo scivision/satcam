@@ -9,13 +9,14 @@ makeplots = {'pix'}; %'lla','azel'
 addpath('../histutils/Matlab')
 
 %% Parameters 
+rowcol=[512,512];
+
 switch event
     case '11Apr2013_irid91'
         dpath = '~/data/2013-04-11/2013-04-11T07-00-CamSer1387_frames_403709-1-405509.DMCdata';
         fps = 30; % camera 1387 for 11 Apr 2013
         camstart = [2013 04 11 7 0 11];
         satappear = [2013 04 11 10 45 12]; %from STK
-        rowcol=[512,512];
         % iridium 91, 11 March 2013
         % tle in satcam-data/sat_27372_test.txt
         usecam = 1;
