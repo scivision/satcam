@@ -29,3 +29,21 @@ vsat_mps = sqrt(mu/a) %tangential speed
 
 wsat_degsec = rad2deg(vsat_mps / a); %[degrees/sec]
 pixelsPerSec = wsat_degsec/(fov_deg/Npix)
+%% frames per pixel
+% for 53 and 30 fps respectively we get the following frames per pixel displacement of the satellite in the image frame.
+% so by inspection we can't just use a simple intensity threshold, but must consider the peak intensity of the pixel to determine
+% when the satellite is closest to the center of the pixel, for any pixel traversal.
+framespix53 = 53/pixelsPerSec
+framespix30 = 30/pixelsPerSec
+%% getting absolute time from pixel crossing
+% consider the pixel crossed could have a maximum error of about four pixels assuming 1km TLE accuracy
+% and 781km satellite altitude.
+% peak time error comes from
+% 1) TLE position accuracy
+% 2) non-constant satellite intensity (Iridium flare)
+%
+% #2 can be worked around by sampling peak intensity at each pixel as it's crossed.
+% For #1, it is observed that along-track error (ATE) is much worse than cross-track or normal to orbital plane error.
+%   a number of references have shown that within 1 day of epoch, along-track error for LEO >400km can be less than 1km, or at least order 1km
+%   it is the nano-sats tossed from ISS at 250km that can accumulate very high along-track error in a couple days,but they're well under 400km.
+% 

@@ -1,27 +1,25 @@
 #!/usr/bin/env python3
-#from scipy.io import netcdf No, can't handle netcdf4 only 3
-import sys
-from pymap3d.coordconv3d import ecef2geodetic,eci2ecef,ecef2eci
-from astrometry_azel.datetime2hourangle import datetime2sidereal
+from pathlib2 import Path
 from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
+#
+from pymap3d.coordconv3d import eci2geodetic
 
-def iridumread(fn,day):
-    with Dataset(fn,'r') as f:
+def iridiumread(fn,day):
+    fn = Path(fn).expanduser()
+    with Dataset(str(fn),'r') as f:
         time = f.variables['time'][:25000].astype(float)
         eci = f.variables['pos_eci'][:25000]
     '''
     https://github.com/dinkelk/astrodynamics/blob/master/ECI2ECEF.m
     '''
 
-    dtime = [parse(day) + relativedelta(hours=h) for h in time]
-    print(dtime[0].strftime('%Y-%m-%dT%H:%M:%S'))
-    print(dtime[-1].strftime('%Y-%m-%dT%H:%M:%S'))
-    lst = datetime2sidereal(dtime)
-    ecef = eci2ecef(eci,lst)
-    lat,lon,alt = ecef2geodetic(ecef)
+    t = [parse(day) + relativedelta(hours=h) for h in time]
+    print(t[0].strftime('%Y-%m-%dT%H:%M:%S'))
+    print(t[-1].strftime('%Y-%m-%dT%H:%M:%S'))
+    lat,lon,alt = eci2geodetic(eci,t)
 
     ax = plt.figure().gca()
     ax.plot(lon,lat)#,marker='.')
@@ -33,27 +31,23 @@ def iridumread(fn,day):
     ax.grid(True)
 
     ax = plt.figure().gca()
-    ax.plot(dtime,alt/1e3)
+    ax.plot(t,alt/1e3)
     ax.set_ylabel('altitude [km]')
     ax.set_xlabel('time')
 
     ax= plt.figure().gca()
-    ax.plot([d.timestamp() for d in dtime])
+    ax.plot([d.timestamp() for d in t])
     ax.set_ylabel('POSIX timestamp [sec]')
-    print(' WHY does the time seem to keep repeating?')
+    #TODO WHY does the time seem to keep repeating?
 
 
     plt.show()
 
 if __name__ == '__main__':
-    from numpy import isclose
-    from sys import argv
-    iridumread(argv[1],argv[2])
+    from argparse import ArgumentParser
+    p = ArgumentParser(description='load and plot position data')
+    p.add_argument('file',help='file to process')
+    p.add_argument('date',help='date to process yyyy-mm-dd')
+    p = p.parse_args()
 
-    ecef = [5e6,2e6,3e6]
-    lst = datetime2sidereal(parse('2013-04-14'))
-    eci = ecef2eci(ecef,lst)
-    ecefhat = eci2ecef(eci,lst)
-
-    assert isclose(ecef, ecefhat).all()
-
+    iridiumread(p.file,p.date)
