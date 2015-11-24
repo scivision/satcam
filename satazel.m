@@ -139,7 +139,7 @@ if any(ismember(makeplots,'pix')) && ~isempty(satpix)
 
     tlblpts(satpix(:,1),satpix(:,2),t,npts)
    % legend('show','location','best')
- %   set(axpix,'xlim',[1,nx],'ylim',[1,ny])
+    %set(axpix,'xlim',[-inf,nx],'ylim',[-inf,ny])
 end
 %% no outputs?
 if ~nargout, clear, end

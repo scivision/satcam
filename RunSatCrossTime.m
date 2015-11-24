@@ -10,12 +10,18 @@ addpath('../histutils/Matlab')
 
 %% Parameters 
 rowcol=[512,512];
-
+playmovie.fps=20; playmovie.clim=[100 3700];
 switch event
     case '14Apr2013T0824'
-        dpath = '~/data/2013-04-14/2013-04-14T07-00-CamSer7196_frames';
-        fps = 50;
-        camstart = 
+        dpath = '~/data/2013-04-14/HST/2013-04-14T0822_hst0.h5'; %'~/U/irs_archive3/HSTdata/2013-04-14-HST0/2013-04-14T07-00-CamSer7196.DMCdata';
+        fps = 53;
+        camstart = [2013 04 14 6 59 55];
+        satappear= [2013 04 14 8 24 11];
+        usecam = 0;
+        calfn = '../histfeas/precompute/hst0cal.h5';
+        TLEfn = '../satcam-data/stkAllComm_2013-04-13.tle';
+        satnum=24906;
+        trange = [-5 15];
     case '11Apr2013T1045'
         dpath = '~/data/2013-04-11/2013-04-11T07-00-CamSer1387_frames_403709-1-405509.DMCdata';
         fps = 30; % camera 1387 for 11 Apr 2013
@@ -72,7 +78,7 @@ if isempty(satpix)
     error('I can''t proceed since the satellite is not detected in the FOV. Is the az/el calibration correct for this date?')
 end
 %%
-intensevals = pixelcrossing(dpath,satpix,satappear,camstart,fps,tstart,trange,rowcol);
+intensevals = pixelcrossing(dpath,satpix,satappear,camstart,fps,tstart,trange,rowcol,playmovie);
 %%
 if ~nargout,clear,end
 end %function
