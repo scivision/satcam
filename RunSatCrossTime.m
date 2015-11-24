@@ -1,6 +1,9 @@
 function intensevals= RunSatCrossTime(event)
 %%
 % compares points from satazel for points satellite crosses in DMCdata
+%
+% TLE accuracy is ~1 km, so for 9 deg. FOV and 512 pixels at 781km
+%
 % examples:
 % RunSatCrossTime('11Apr2013_irid91')
 % RunSatCrossTime('1Mar2014_irid30')
@@ -13,7 +16,9 @@ rowcol=[512,512];
 playmovie.fps=20; playmovie.clim=[100 3700];
 switch event
     case '14Apr2013T0824'
-        dpath = '~/data/2013-04-14/HST/2013-04-14T0822_hst0.h5'; %'~/U/irs_archive3/HSTdata/2013-04-14-HST0/2013-04-14T07-00-CamSer7196.DMCdata';
+        dpath = '~/data/2013-04-14/HST/2013-04-14T0822_hst0.h5'; 
+        %python ConvertDMC2h5.py '~/U/irs_archive3/HSTdata/2013-04-14-HST0/2013-04-14T07-00-CamSer7196.DMCdata' -o ~/data/2013-04-14/HST/2013-04-14T0822_hst0.h5 -f 267703 268763 1 -k 0.018867924528302
+        %dpath='~/U/irs_archive3/HSTdata/2013-04-14-HST0/2013-04-14T07-00-CamSer7196.DMCdata';
         fps = 53;
         camstart = [2013 04 14 6 59 55];
         satappear= [2013 04 14 8 24 11];
