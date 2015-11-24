@@ -1,6 +1,6 @@
-function intensevals = pixelcrossing(fn,satpix,satappear,camstart,fps,tstart,trange,rowcol)
+function intensevals = pixelcrossing(fn,satpix,satappear,camstart,fps,tstart,trange,rowcol,playmovie)
 %% load .DMCdata file
-[startrawind, endrawind, data] = timeDMCreader(fn,satappear,camstart,fps,trange,rowcol);
+data = timeDMCreader(fn,satappear,camstart,fps,trange,rowcol,playmovie);
 %% checkout first time step of satellite in FOV
 % pixel indices of first timestep pixel crossing
 %intensevals = data(satpix(1,1),satpix(1,2),:);
