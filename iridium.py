@@ -8,7 +8,7 @@ from datetime import timedelta
 from pytz import UTC
 from numpy import arange,diff,nonzero,array
 #
-from pymap3d.coordconv3d import eci2aer,eci2geodetic
+from pymap3d.coordconv3d import eci2aer,eci2geodetic,eci2ecef
 
 def iridiumread(fn,day,tlim,ellim,sitella):
     fn = Path(fn).expanduser()
@@ -35,12 +35,14 @@ def iridiumread(fn,day,tlim,ellim,sitella):
             #now filter by az,el criteria
             az,el,r = eci2aer(f['pos_eci'][cind,:],sitella[0],sitella[1],sitella[2],t)
             if ((ellim[0] <= el) & (el <= ellim[1])).any():
+                print(t)
                 print('sat psv {}'.format(f['pseudo_sv_num'][i]))
-                lat,lon,alt = eci2geodetic(f['pos_eci'][cind,:],t)
+                eci = f['pos_eci'][cind,:]
+                lat,lon,alt = eci2geodetic(eci,t)
+                x,y,z = eci2ecef(eci,t)
+                print('ecef {} {} {}'.format(x,y,z))
 
 #%%
-    print(t[0].strftime('%Y-%m-%dT%H:%M:%S'))
-    print(t[-1].strftime('%Y-%m-%dT%H:%M:%S'))
     if lon.size<200:
         marker='.'
     else:
