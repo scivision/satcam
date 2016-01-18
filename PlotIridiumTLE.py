@@ -94,7 +94,7 @@ def optical(vidfn,calfn,T,tstart,fps):
     """
     quick-n-dirty load of optical data to corroborate with other tle and ncdf data
     """
-    data, rawFrameInd,finf,ut1_unix = goRead(vidfn,xyPix=(512,512),xyBin=(1,1), ut1Req=T,kineticraw=1/fps,startUTC=tstart)
+    data, rawFrameInd,finf = goRead(vidfn,xyPix=(512,512),xyBin=(1,1), ut1Req=T,kineticraw=1/fps,startUTC=tstart)
 
     calfn = Path(calfn).expanduser()
     with h5py.File(str(calfn),'r',libver='latest') as f:
