@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-from __future__ import division
-from six import integer_types,string_types
-from pathlib2 import Path
+from pathlib import Path
 import h5py
 from ephem import readtle,Observer
 from netCDF4 import Dataset
@@ -16,7 +14,6 @@ from pymap3d.coordconv3d import eci2aer,eci2geodetic,eci2ecef,geodetic2ecef
 from histutils.rawDMCreader import goRead
 
 def iridium_ncdf(fn,day,tlim,ellim,sitella):
-    assert isinstance(fn,(string_types,Path)),'must specify filename to load'
     assert len(ellim) == 2,'must specify elevation limits'
     fn = Path(fn).expanduser()
     day = day.astimezone(UTC)
@@ -59,7 +56,7 @@ def iridium_ncdf(fn,day,tlim,ellim,sitella):
     return (None,None)
 
 def iridium_tle(fn,T,sitella,svn):
-    assert isinstance(svn,integer_types)
+    assert isinstance(svn,int)
     assert len(sitella)==3
     assert isinstance(T[0],datetime),'parse your date'
 
