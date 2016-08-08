@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-from pathlib import Path
+#!/usr/bin/env python
+from . import Path
 import h5py
 from ephem import readtle,Observer
 from netCDF4 import Dataset
