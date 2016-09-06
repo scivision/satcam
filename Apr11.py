@@ -35,7 +35,7 @@ def fovcross(ncfn,tlefn,svn,vidfn,calfn,t0,tlim):
     nr,nc = findClosestAzel(azcam,elcam,
                             aer['az'].values, aer['el'].values)
 #%%
-    plots(lla,llatle,img)
+    plots(lla,llatle,img,nr,nc)
 
 if __name__ == '__main__':
     ncfn='~/iridium/20130411Amp_invert.ncdf'

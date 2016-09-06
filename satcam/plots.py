@@ -1,10 +1,10 @@
 from pandas import DataFrame
 from matplotlib.pyplot import figure
 
-def plots(lla,llatle, img):
+def plots(lla,llatle, img, satcal,satrow):
     if not isinstance(lla,DataFrame):
         return
-    assert img.ndim == 2,'one image please'
+
 #%% don't overclutter plot
     if lla.shape[0]<200:
         marker='.'
@@ -26,7 +26,13 @@ def plots(lla,llatle, img):
 #    ax.set_ylabel('altitude [km]')
 #    ax.set_xlabel('time')
 #%% optical
-    fg = figure()
-    ax = fg.gca()
-    hi=ax.imshow(img,cmap='gray',vmin=500,vmax=2000)
-    fg.colorbar(hi,ax=ax)
+    if img is not None:
+        assert img.ndim == 2,'one image please'
+
+        fg = figure()
+        ax = fg.gca()
+        hi=ax.imshow(img,cmap='gray',vmin=1000,vmax=1500,origin='bottom')
+        fg.colorbar(hi,ax=ax)
+
+        ax.plot(satcal,satrow,linestyle='none',color='red',marker='*')
+
