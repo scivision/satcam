@@ -11,7 +11,7 @@ from ephem import readtle,Observer
 from netCDF4 import Dataset
 #
 from histutils.fortrandates import forceutc
-from pymap3d.coordconv3d import eci2aer,eci2geodetic,eci2ecef,geodetic2ecef
+from pymap3d import eci2aer,eci2geodetic,eci2ecef,geodetic2ecef
 
 
 def iridium_ncdf(fn,day,tlim,ellim, camlla):
