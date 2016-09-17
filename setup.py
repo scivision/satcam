@@ -10,8 +10,12 @@ except Exception as e:
 #%% install
 setup(name='satcam',
       description='Discover times and pixels of satellite crossings with camera',
-      author='Michael Hirsch',
       url='https://github.com/scienceopen/satcam',
-      install_requires=['pathlib2'],
+      dependency_links = [
+        'https://github.com/scienceopen/histutils/tarball/master#egg=histutils',
+        ],
+      install_requires=['pathlib2',
+                        #'histutils'
+                        ],
       packages=['satcam']
       )
