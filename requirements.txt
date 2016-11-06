@@ -1,4 +1,10 @@
+setuptools
+nose
+six
+ephem
+numpy
+astropy
 netCDF4
 matplotlib
-pathlib2
 python-dateutil
+pytz
