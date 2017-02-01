@@ -1,9 +1,4 @@
-try:
-    from pathlib import Path
-    Path().expanduser()
-except (ImportError,AttributeError):
-    from pathlib2 import Path
-#
+from pathlib import Path
 from datetime import timedelta, datetime
 from pandas import DataFrame
 from numpy import arange,diff,array,column_stack,degrees
