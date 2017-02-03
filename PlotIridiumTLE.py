@@ -5,14 +5,14 @@ from datetime import datetime
 from pytz import UTC
 #
 from satcam import iridium_tle, iridium_ncdf
-from satcam.plots import iridium_plot
+from satcam.plots import plots
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
     p = ArgumentParser(description='load and plot position data')
-    p.add_argument('--ncfn',help='.ncdf file to process')
-    p.add_argument('--tlefn',help='.tle file to process')
-    p.add_argument('-t','--date',help='date to process yyyy-mm-dd')
+    p.add_argument('ncfn',help='.ncdf file to process')
+    p.add_argument('tlefn',help='.tle file to process')
+    p.add_argument('date',help='date to process yyyy-mm-dd')
     p.add_argument('-l','--tlim',help='start stop time',nargs=2)
     p.add_argument('-e','--ellim',help='el limits [deg]',nargs=2,type=float)
     p.add_argument('-c','--lla',help='lat,lon,alt of site [deg,deg,meters]',nargs=3,type=float)
@@ -31,5 +31,5 @@ if __name__ == '__main__':
 
     eceftle,llatle = iridium_tle(p.tlefn,lla.index,p.lla,p.svn)
 
-    iridium_plot(lla,llatle)
+    plots(lla,llatle)
     show()

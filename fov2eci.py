@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # work in progress, may be not altogether correct
-from . import Path
+from pathlib import Path
 import h5py
 
 def fov2eci(ll,ur):

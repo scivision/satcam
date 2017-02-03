@@ -1,4 +1,4 @@
-from . import Path
+from pathlib import Path
 import h5py
 from datetime import timedelta,datetime
 import logging
