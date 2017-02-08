@@ -5,7 +5,7 @@ from numpy import arange,diff,array,column_stack,degrees
 from ephem import readtle,Observer
 from netCDF4 import Dataset
 #
-from histutils.fortrandates import forceutc
+from sciencedates import forceutc
 from pymap3d import eci2aer,eci2geodetic,eci2ecef,geodetic2ecef
 
 

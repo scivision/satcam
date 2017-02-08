@@ -3,8 +3,7 @@ import h5py
 from datetime import timedelta,datetime
 import logging
 #
-from histutils.fortrandates import forceutc
-from histutils.findnearest import find_nearest
+from sciencedates import forceutc,find_nearest
 #from histutils.rawDMCreader import goRead
 
 def optical(vidfn,calfn,treq,terror_cam):
