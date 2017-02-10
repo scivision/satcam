@@ -1,9 +1,0 @@
-setuptools
-nose
-ephem
-numpy
-astropy
-netCDF4
-matplotlib
-python-dateutil
-pytz
