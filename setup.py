@@ -7,7 +7,7 @@ req = ['histutils','nose','ephem','numpy','astropy','netCDF4','matplotlib','pyth
 setup(name='satcam',
       packages=['satcam'],
       author='Michael Hirsch, Ph.D.',
-      url='https://github.com/scienceopen/satcam',
+      url='https://github.com/scivision/satcam',
       description='intersection of camera FOV and satellite passes',
       classifiers=[
         'Programming Language :: Python :: 3.6',
