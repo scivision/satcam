@@ -46,7 +46,7 @@ if nargin<7, calfile = []; end
 % goal of this is to verify absolute timing of camera
 if ~isempty(calfile)
     try
-    %load astrometry.net plate scale file we made from github.com/scienceopen/astrometry_azel/fits2azel.py
+    %load astrometry.net plate scale file we made from github.com/scivision/astrometry_azel
     
     [azcal,elcal,xcal,ycal] = getcamcal(calfile);
     
