@@ -1,16 +1,7 @@
 #!/usr/bin/env python
-req = ['nose','ephem','numpy','astropy','netCDF4','matplotlib','python-dateutil','pytz']
-pipreq= ['histutils']
-
-# %%
-import pip
-try:
-    import conda.cli
-    conda.cli.main('install',*req)
-except Exception as e:
-    pip.main(['install'] +req)
-pip.main(['install']+pipreq)
-
+install_requires = ['ephem','numpy','astropy','netCDF4','matplotlib','python-dateutil','pytz',
+'histutils']
+tests_require=['nose','coveralls']
 # %%
 from setuptools import setup
 
@@ -22,5 +13,8 @@ setup(name='satcam',
       classifiers=[
         'Programming Language :: Python :: 3',
       ],
-      install_requires=req+pipreq,
+      install_requires=install_requires,
+      tests_require=tests_require,
+      extras_require={'tests':tests_require},
+      python_requires='>=3.6',
       )
