@@ -2,8 +2,10 @@
 # work in progress, may be not altogether correct
 from pathlib import Path
 import h5py
+import argparse
 
-def fov2eci(ll,ur):
+
+def fov2eci(ll, ur):
     """
     input:
     ------
@@ -11,20 +13,20 @@ def fov2eci(ll,ur):
     ur: upper right of az,el bounding box [deg]
     """
 
+
 def loadfov(fn):
     fn = Path(fn).expanduser()
-    with h5py.File(str(fn),'r') as f:
+    with h5py.File(fn, 'r') as f:
         az = f['az'].value
         el = f['el'].value
 
-    return az,el
+    return az, el
 
 
 if __name__ == '__main__':
-    from argparse import ArgumentParser
-    p = ArgumentParser()
-    p.add_argument('fn',help='fov filename to load')
-    p.add_argumnet('--alt',help='scalar altitude to use [km]',type=float,default=781.)
-    p = p.parse_args()
+    p = argparse.ArgumentParser()
+    p.add_argument('fn', help='fov filename to load')
+    p.add_argument('--alt', help='scalar altitude to use [km]', type=float, default=781.0)
+    P = p.parse_args()
 
-    az,el = loadfov(p.fn)
+    az, el = loadfov(P.fn)
